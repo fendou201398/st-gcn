@@ -100,7 +100,7 @@ class Processor(IO):
         self.epoch_info['mean loss'] = 1
         self.show_epoch_info()
 
-    def start(self):
+    def start(self):  #此处执行的程序
         self.io.print_log('Parameters:\n{}\n'.format(str(vars(self.arg))))
 
         # training phase
