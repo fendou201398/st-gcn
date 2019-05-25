@@ -19,7 +19,7 @@ from torchlight import import_class
 from .processor import Processor
 
 def weights_init(m):
-    classname = m.__class__.__name__
+    classname = m.__class__.__name__   # __class__查看对象所在的类
     if classname.find('Conv1d') != -1:
         m.weight.data.normal_(0.0, 0.02)
         if m.bias is not None:
@@ -149,7 +149,7 @@ class REC_Processor(Processor):
         parent_parser = Processor.get_parser(add_help=False)
         parser = argparse.ArgumentParser(
             add_help=add_help,
-            parents=[parent_parser],
+            parents=[parent_parser],   #继承了Processor.get_parser（）里面的参数
             description='Spatial Temporal Graph Convolution Network')
 
         # region arguments yapf: disable

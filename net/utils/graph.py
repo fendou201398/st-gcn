@@ -75,8 +75,9 @@ class Graph():
         else:
             raise ValueError("Do Not Exist This Layout.")
 
+    #计算邻接矩阵A
     def get_adjacency(self, strategy):
-        valid_hop = range(0, self.max_hop + 1, self.dilation)
+        valid_hop = range(0, self.max_hop + 1, self.dilation)  #range(start,stop,step)
         adjacency = np.zeros((self.num_node, self.num_node))
         for hop in valid_hop:
             adjacency[self.hop_dis == hop] = 1
