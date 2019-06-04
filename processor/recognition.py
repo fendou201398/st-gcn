@@ -19,9 +19,9 @@ from torchlight import import_class
 from .processor import Processor
 
 def weights_init(m):
-    classname = m.__class__.__name__   # __class__查看对象所在的类
-    if classname.find('Conv1d') != -1:
-        m.weight.data.normal_(0.0, 0.02)
+    classname = m.__class__.__name__     # __class__查看对象所在的类
+    if classname.find('Conv1d') != -1:   # 如果发现这个Conv1d字符串
+        m.weight.data.normal_(0.0, 0.02) #平均值为0.0,方差为0.02的数据正则化
         if m.bias is not None:
             m.bias.data.fill_(0)
     elif classname.find('Conv2d') != -1:
@@ -40,8 +40,8 @@ class REC_Processor(Processor):
     def load_model(self):
         self.model = self.io.load_model(self.arg.model,
                                         **(self.arg.model_args))
-        self.model.apply(weights_init)
-        self.loss = nn.CrossEntropyLoss()
+        self.model.apply(weights_init)  #apply()函数复制函数weights_init()的功能给self.modle
+        self.loss = nn.CrossEntropyLoss() #定义交叉商和损失函数
         
     def load_optimizer(self):
         if self.arg.optimizer == 'SGD':

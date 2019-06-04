@@ -129,14 +129,18 @@ def get_hop_distance(num_node, edge, max_hop=1):
         A[i, j] = 1
 
     # compute hop steps
-    hop_dis = np.zeros((num_node, num_node)) + np.inf
+    hop_dis = np.zeros((num_node, num_node)) + np.inf  # np.inf 表示一个无穷大的正数
+    # np.linalg.matrix_power(A, d)求矩阵A的d幂次方,transfer_mat矩阵(I,A)是一个将A矩阵拼接max_hop+1次的矩阵
     transfer_mat = [np.linalg.matrix_power(A, d) for d in range(max_hop + 1)]
+    # (np.stack(transfer_mat) > 0)矩阵中大于0的返回Ture,小于0的返回False,最终arrive_mat是一个布尔矩阵,大小与transfer_mat一样
     arrive_mat = (np.stack(transfer_mat) > 0)
+    # range(start,stop,step) step=-1表示倒着取
     for d in range(max_hop, -1, -1):
+        # 将arrive_mat[d]矩阵中为True的对应于hop_dis[]位置的数设置为d
         hop_dis[arrive_mat[d]] = d
     return hop_dis
 
-
+# 将矩阵A中的每一列的各个元素分别除以此列元素的形成新的矩阵
 def normalize_digraph(A):
     Dl = np.sum(A, 0)
     num_node = A.shape[0]

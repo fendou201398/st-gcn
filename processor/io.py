@@ -36,6 +36,7 @@ class IO():
         if p.config is not None:
             # load config file
             with open(p.config, 'r') as f:
+                # default_arg是字典的形式
                 default_arg = yaml.load(f)
 
             # update parser from config file
