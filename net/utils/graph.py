@@ -121,7 +121,7 @@ class Graph():
         else:
             raise ValueError("Do Not Exist This Strategy")
 
-
+# 此函数的返回值hop_dis就是图的邻接矩阵
 def get_hop_distance(num_node, edge, max_hop=1):
     A = np.zeros((num_node, num_node))
     for i, j in edge:
@@ -142,7 +142,7 @@ def get_hop_distance(num_node, edge, max_hop=1):
 
 # 将矩阵A中的每一列的各个元素分别除以此列元素的形成新的矩阵
 def normalize_digraph(A):
-    Dl = np.sum(A, 0)
+    Dl = np.sum(A, 0) #将矩阵A压缩成一行
     num_node = A.shape[0]
     Dn = np.zeros((num_node, num_node))
     for i in range(num_node):

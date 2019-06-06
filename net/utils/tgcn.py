@@ -63,4 +63,4 @@ class ConvTemporalGraphical(nn.Module):
         x = x.view(n, self.kernel_size, kc//self.kernel_size, t, v)
         x = torch.einsum('nkctv,kvw->nctw', (x, A))
 
-        return x.contiguous(), A
+        return x.contiguous(), Az
