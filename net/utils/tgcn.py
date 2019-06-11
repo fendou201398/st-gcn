@@ -54,13 +54,18 @@ class ConvTemporalGraphical(nn.Module):
             dilation=(t_dilation, 1),
             bias=bias)
 
+
+    # forward()函数完成图卷积操作,x由（64,3,300,18）变成（64,64,300,18）
     def forward(self, x, A):
         assert A.size(0) == self.kernel_size
 
         x = self.conv(x)
-
+        # (64,192,300,18)
         n, kc, t, v = x.size()
+        # (64,3,64,300,18)
         x = x.view(n, self.kernel_size, kc//self.kernel_size, t, v)
+        # (64,64,300,18)
+        # 此处的k消失的原因：在k维度上进行了求和操作,也即是x在邻接矩阵A的3个不同的子集上进行乘机操作再进行求和,对应于论文中的公式10
         x = torch.einsum('nkctv,kvw->nctw', (x, A))
-
-        return x.contiguous(), Az
+        # contiguous()把tensor x变成在内存中连续分布的形式
+        return x.contiguous(), A

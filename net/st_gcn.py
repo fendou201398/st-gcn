@@ -69,9 +69,10 @@ class Model(nn.Module):
     def forward(self, x):
 
         # data normalization
-        N, C, T, V, M = x.size()
-        x = x.permute(0, 4, 3, 1, 2).contiguous()
-        x = x.view(N * M, V * C, T)
+        N, C, T, V, M = x.size() #(64,3,300,18,1)
+        # permute()将tensor的维度换位
+        x = x.permute(0, 4, 3, 1, 2).contiguous() #(64,1,18,3,300)
+        x = x.view(N * M, V * C, T) #(64,54,300)
         x = self.data_bn(x)
         x = x.view(N, M, V, C, T)
         x = x.permute(0, 1, 3, 4, 2).contiguous()
