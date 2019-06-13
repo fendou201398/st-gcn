@@ -40,7 +40,7 @@ def auto_pading(data_numpy, size, random_pad=False):
 
 
 def random_choose(data_numpy, size, auto_pad=True):
-    # input: C,T,V,M
+    # input: C,T,V,M (3,300,18,2)
     C, T, V, M = data_numpy.shape
     if T == size:
         return data_numpy
@@ -50,7 +50,7 @@ def random_choose(data_numpy, size, auto_pad=True):
         else:
             return data_numpy
     else:
-        begin = random.randint(0, T - size)
+        begin = random.randint(0, T - size) #随机生成一个指定范围内的整数
         return data_numpy[:, begin:begin + size, :, :]
 
 
@@ -62,7 +62,9 @@ def random_move(data_numpy,
     # input: C,T,V,M
     C, T, V, M = data_numpy.shape
     move_time = random.choice(move_time_candidate)
+    # node = [0]
     node = np.arange(0, T, T * 1.0 / move_time).round().astype(int)
+    # node = [0,150]
     node = np.append(node, T)
     num_node = len(node)
 
@@ -78,7 +80,7 @@ def random_move(data_numpy,
 
     # linspace
     for i in range(num_node - 1):
-        a[node[i]:node[i + 1]] = np.linspace(
+        a[node[i]:node[i + 1]] = np.linspace(     # np.linspace() 等差数列
             A[i], A[i + 1], node[i + 1] - node[i]) * np.pi / 180
         s[node[i]:node[i + 1]] = np.linspace(S[i], S[i + 1],
                                              node[i + 1] - node[i])

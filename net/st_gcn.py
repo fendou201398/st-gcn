@@ -73,21 +73,24 @@ class Model(nn.Module):
         # permute()将tensor的维度换位
         x = x.permute(0, 4, 3, 1, 2).contiguous() #(64,1,18,3,300)
         x = x.view(N * M, V * C, T) #(64,54,300)
-        x = self.data_bn(x)
-        x = x.view(N, M, V, C, T)
-        x = x.permute(0, 1, 3, 4, 2).contiguous()
-        x = x.view(N * M, C, T, V)
+        x = self.data_bn(x) # 将某一个节点的（X,Y,C）中每一个数值在时间维度上分别进行归一化
+        x = x.view(N, M, V, C, T) #(64,1,18,3,300)
+        x = x.permute(0, 1, 3, 4, 2).contiguous() #（64,1,3,300,18）
+        x = x.view(N * M, C, T, V) #（64,3,300,18）
 
-        # forwad
+        # forward
         for gcn, importance in zip(self.st_gcn_networks, self.edge_importance):
             x, _ = gcn(x, self.A * importance)
 
         # global pooling
-        x = F.avg_pool2d(x, x.size()[2:])
+        # 此处的x是运行完所有的卷积层之后在进行平均池化之后的维度x=(64,256,1)
+        x = F.avg_pool2d(x, x.size()[2:]) # pool层的大小是(300,18)
+        # （64,256,1,1）
         x = x.view(N, M, -1, 1, 1).mean(dim=1)
 
         # prediction
         x = self.fcn(x)
+        # （64,400）
         x = x.view(x.size(0), -1)
 
         return x
@@ -103,18 +106,22 @@ class Model(nn.Module):
         x = x.permute(0, 1, 3, 4, 2).contiguous()
         x = x.view(N * M, C, T, V)
 
-        # forwad
+        # forward
         for gcn, importance in zip(self.st_gcn_networks, self.edge_importance):
-            x, _ = gcn(x, self.A * importance)
+            x, _ = gcn(x, self.A * importance) #（64,256,300,18）
 
-        _, c, t, v = x.size()
+        _, c, t, v = x.size() #（64,256,300,18）
+        # feature的维度是（64,256,300,18,1）
         feature = x.view(N, M, c, t, v).permute(0, 2, 3, 4, 1)
 
         # prediction
+        # (64,400,300,18)
         x = self.fcn(x)
+        # output: (64,400,300,18,1)
         output = x.view(N, M, -1, t, v).permute(0, 2, 3, 4, 1)
 
         return output, feature
+
 
 class st_gcn(nn.Module):
     r"""Applies a spatial temporal graph convolution over an input graph sequence.
@@ -156,7 +163,7 @@ class st_gcn(nn.Module):
 
         self.gcn = ConvTemporalGraphical(in_channels, out_channels,
                                          kernel_size[1])
-
+        # self.tcn()没有改变变量x.size()
         self.tcn = nn.Sequential(
             nn.BatchNorm2d(out_channels),
             nn.ReLU(inplace=True),
@@ -193,6 +200,8 @@ class st_gcn(nn.Module):
 
         res = self.residual(x)
         x, A = self.gcn(x, A)
-        x = self.tcn(x) + res
-
+        x = self.tcn(x) + res #(64,64,300,18)
+        # (64,64,300,18)
         return self.relu(x), A
+
+

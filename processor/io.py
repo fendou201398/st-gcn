@@ -40,6 +40,7 @@ class IO():
                 default_arg = yaml.load(f)
 
             # update parser from config file
+            # vars() 函数返回对象object的属性和属性值的字典对象
             key = vars(p).keys()
             for k in default_arg.keys():
                 if k not in key:
@@ -81,7 +82,7 @@ class IO():
         for name, value in vars(self).items():
             cls_name = str(value.__class__)
             if cls_name.find('torch.nn.modules') != -1:
-                setattr(self, name, value.to(self.dev))
+                setattr(self, name, value.to(self.dev)) #设置属性name的值，也就是将损失函数loss移动到GPU上
 
         # model parallel
         if self.arg.use_gpu and len(self.gpus) > 1:

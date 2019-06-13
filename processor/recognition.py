@@ -40,7 +40,7 @@ class REC_Processor(Processor):
     def load_model(self):
         self.model = self.io.load_model(self.arg.model,
                                         **(self.arg.model_args))
-        self.model.apply(weights_init)  #apply()函数复制函数weights_init()的功能给self.modle
+        self.model.apply(weights_init)  #apply()函数将model中的所有的层进行权重初始化
         self.loss = nn.CrossEntropyLoss() #定义交叉商和损失函数
         
     def load_optimizer(self):
@@ -62,6 +62,7 @@ class REC_Processor(Processor):
     def adjust_lr(self):
         if self.arg.optimizer == 'SGD' and self.arg.step:
             lr = self.arg.base_lr * (
+                #self.meta_info['epoch']>= np.array(self.arg.step) 返回一个[[False, False, False, False]],False数值上=0,true=1
                 0.1**np.sum(self.meta_info['epoch']>= np.array(self.arg.step)))
             for param_group in self.optimizer.param_groups:
                 param_group['lr'] = lr
